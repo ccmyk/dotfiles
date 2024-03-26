@@ -99,6 +99,7 @@ SPACESHIP_PROJECT="$HOME/Projects/Repos/spaceship/spaceship-prompt"
 # Reset zgen on change
 ZGEN_RESET_ON_CHANGE=(
   ${HOME}/.zshrc
+  ${HOME}/.zshlocal
   ${DOTFILES}/lib/*.zsh
 )
 
