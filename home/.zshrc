@@ -9,79 +9,72 @@
 # Environment
 # ------------------------------------------------------------------------------
 
-# Guard to prevent duplicate execution
-if [ -z "$PATH_MODIFIED" ]; then
-    # Locale
-    export LC_ALL=en_US.UTF-8
-    export LANG=en_US.UTF-8
-    export LANGUAGE=en_US.UTF-8  
+# Export path to root of dotfiles repo
+export DOTFILES=${DOTFILES:="$HOME/.dotfiles"}
 
-    # Export path to root of dotfiles repo
-    export DOTFILES=${DOTFILES:="$HOME/.dotfiles"}
+# Locale
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+export LANGUAGE=en_US.UTF-8
 
-    # Prevent file overwrites using `>`
-    set -o noclobber
+# Do not override files using `>`, but it's still possible using `>!`
+set -o noclobber
 
-    # Extend $PATH without duplicates
-    _extend_path() {
-        [[ -d "$1" ]] || return
+# Extend $PATH without duplicates
+_extend_path() {
+  [[ -d "$1" ]] || return
 
-        if ! $( echo "$PATH" | tr ":" "\n" | grep -qx "$1" ) ; then
-            export PATH="$1:$PATH"
-        fi
-    }
+  if ! $( echo "$PATH" | tr ":" "\n" | grep -qx "$1" ) ; then
+    export PATH="$1:$PATH"
+  fi
+}
 
-    # Add custom bin to $PATH
-    _extend_path "$HOME/.local/bin"
-    _extend_path "$DOTFILES/bin"
-    _extend_path "$HOME/.npm-global/bin"
-    _extend_path "$HOME/.rvm/bin"
-    _extend_path "$HOME/.yarn/bin"
-    _extend_path "$HOME/.config/yarn/global/node_modules/.bin"
-    _extend_path "$HOME/.bun/bin"
-    _extend_path "$HOME/.pyenv/shims"
+# Add custom bin to $PATH
+_extend_path "$HOME/.local/bin"
+_extend_path "$DOTFILES/bin"
+_extend_path "$HOME/.npm-global/bin"
+_extend_path "$HOME/.rvm/bin"
+_extend_path "$HOME/.yarn/bin"
+_extend_path "$HOME/.config/yarn/global/node_modules/.bin"
+_extend_path "$HOME/.bun/bin"
 
-    # Extend $NODE_PATH
-    if [ -d ~/.npm-global ]; then
-      export NODE_PATH="$NODE_PATH:$HOME/.npm-global/lib/node_modules"
-    fi
-
-    # Default pager
-    export PAGER='less'
-
-    # less options
-    less_opts=(
-      # Quit if entire file fits on first screen.
-      -FX
-      # Ignore case in searches that do not contain uppercase.
-      --ignore-case
-      # Allow ANSI colour escapes, but no other escapes.
-      --RAW-CONTROL-CHARS
-      # Quiet the terminal bell. (when trying to scroll past the end of the buffer)
-      --quiet
-      # Do not complain when we are on a dumb terminal.
-      --dumb
-    )
-    export LESS="${less_opts[*]}"
-
-    # Default editor for local and remote sessions
-    if [[ -n "$SSH_CONNECTION" ]]; then
-      # on the server
-      if command -v vim >/dev/null 2>&1; then
-        export EDITOR='vim'
-      else
-        export EDITOR='vi'
-      fi
-    else
-      export EDITOR='vim'
-    fi
-
-    # Better formatting for time command
-    export TIMEFMT=$'\n================\nCPU\t%P\nuser\t%*U\nsystem\t%*S\ntotal\t%*E'
-
-    # Set flag to indicate that PATH has been modified
-    export PATH_MODIFIED=true
+# Extend $NODE_PATH
+if [ -d ~/.npm-global ]; then
+  export NODE_PATH="$NODE_PATH:$HOME/.npm-global/lib/node_modules"
 fi
+
+# Default pager
+export PAGER='less'
+
+# less options
+less_opts=(
+  # Quit if entire file fits on first screen.
+  -FX
+  # Ignore case in searches that do not contain uppercase.
+  --ignore-case
+  # Allow ANSI colour escapes, but no other escapes.
+  --RAW-CONTROL-CHARS
+  # Quiet the terminal bell. (when trying to scroll past the end of the buffer)
+  --quiet
+  # Do not complain when we are on a dumb terminal.
+  --dumb
+)
+export LESS="${less_opts[*]}"
+
+# Default editor for local and remote sessions
+if [[ -n "$SSH_CONNECTION" ]]; then
+  # on the server
+  if command -v vim >/dev/null 2>&1; then
+    export EDITOR='vim'
+  else
+    export EDITOR='vi'
+  fi
+else
+  export EDITOR='vim'
+fi
+
+# Better formatting for time command
+export TIMEFMT=$'\n================\nCPU\t%P\nuser\t%*U\nsystem\t%*S\ntotal\t%*E'
 
 # ------------------------------------------------------------------------------
 # Oh My Zsh
@@ -99,6 +92,9 @@ fi
 # ------------------------------------------------------------------------------
 # Dependencies
 # ------------------------------------------------------------------------------
+
+# Spaceship project directory (for local development)
+SPACESHIP_PROJECT="$HOME/Projects/Repos/spaceship/spaceship-prompt"
 
 # Reset zgen on change
 ZGEN_RESET_ON_CHANGE=(
@@ -134,20 +130,32 @@ if ! zgen saved; then
 
     # Custom plugins
     zgen load chriskempson/base16-shell
+    zgen load djui/alias-tips
     zgen load agkozak/zsh-z
+    zgen load marzocchi/zsh-notify
     zgen load hlissner/zsh-autopair
     zgen load zsh-users/zsh-syntax-highlighting
     zgen load zsh-users/zsh-autosuggestions
-
+    
     # Files
     zgen load $DOTFILES/lib
     zgen load $DOTFILES/custom
+
+    # Load Spaceship prompt from remote
+    if [[ ! -d "$SPACESHIP_PROJECT" ]]; then
+      zgen load spaceship-prompt/spaceship-prompt spaceship
+    fi
 
     # Completions
     zgen load zsh-users/zsh-completions src
 
     # Save all to init script
     zgen save
+fi
+
+# Load Spaceship form local project
+if [[ -d "$SPACESHIP_PROJECT" ]]; then
+  source "$SPACESHIP_PROJECT/spaceship.zsh"
 fi
 
 # ------------------------------------------------------------------------------
@@ -174,8 +182,6 @@ fi
 if [ -f "$HOME/.fzf.zsh" ]; then
   source "$HOME/.fzf.zsh"
 fi
-export FZF_DEFAULT_OPS="--extended"
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 # ------------------------------------------------------------------------------
 # Overrides
@@ -186,23 +192,7 @@ if [[ -f "$HOME/.zshlocal" ]]; then
   source "$HOME/.zshlocal"
 fi
 
-export PATH="$HOME/Qt/6.6.1/gcc_64/bin:$PATH"
-export Qt6_DIR=~/Qt/6.6.1/gcc_64/lib/cmake/Qt6
-alias grep &>/dev/null && unalias grep
+# ------------------------------------------------------------------------------
 
-eval "$(starship init zsh)"
-
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-umask 007
+# Fig post block. Keep at the bottom of this file.
 [[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.post.zsh"
-
-export PATH=$PATH:/home/noah/.nvm/versions/node/v20.11.0/bin
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-if command -v pyenv 1>/dev/null 2>&1; then
-  eval "$(pyenv init --path)"
-fi
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
