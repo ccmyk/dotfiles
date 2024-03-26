@@ -116,5 +116,5 @@
 [safe]
 	directory = /var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Plug-ins
 [credential]
-	helper = manager-core
+	helper = cache --timeout=3600
 	credentialStore = secretservice
