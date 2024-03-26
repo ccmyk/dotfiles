@@ -113,3 +113,5 @@
 #   email = denysdovhan@gmail.com
 [include]
   path = ~/.gitlocal
+[safe]
+	directory = /var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Plug-ins
