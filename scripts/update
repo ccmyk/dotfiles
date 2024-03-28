@@ -82,7 +82,7 @@ update_brew() {
   finish
 }
 
-update_apt_get() {
+update_apt() {
   if ! _exists apt; then
     return
   fi
@@ -93,6 +93,19 @@ update_apt_get() {
   sudo apt upgrade -y
   sudo apt autoremove -y
   sudo apt autoclean -y
+
+  finish
+}
+
+update_npm() {
+  if ! _exists npm; then
+    return
+  fi
+
+  info "Updating NPM..."
+
+  npm install npm -g
+  npm update -g
 
   finish
 }
@@ -126,6 +139,7 @@ main() {
   update_dotfiles "$*"
   update_brew "$*"
   update_apt "$*"
+  update_npm "$*"
   on_finish "$*"
 }
 
