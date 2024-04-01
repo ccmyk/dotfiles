@@ -65,8 +65,19 @@ if ! zgen saved; then
 
     # Plugins from oh-my-zsh
     zgen oh-my-zsh plugins/git
+    zgen oh-my-zsh plugins/history-substring-search
     zgen oh-my-zsh plugins/npm
-    # ... add other oh-my-zsh plugins here ...
+    zgen oh-my-zsh plugins/sudo
+    zgen oh-my-zsh plugins/command-not-found
+    zgen oh-my-zsh plugins/yarn
+    zgen oh-my-zsh plugins/nvm
+    zgen oh-my-zsh plugins/extract
+    zgen oh-my-zsh plugins/ssh-agent
+    zgen oh-my-zsh plugins/gpg-agent
+    zgen oh-my-zsh plugins/vscode
+    zgen oh-my-zsh plugins/gh
+    zgen oh-my-zsh plugins/common-aliases
+    zgen oh-my-zsh plugins/docker
 
     # Custom plugins
     zgen load chriskempson/base16-shell
@@ -74,11 +85,14 @@ if ! zgen saved; then
     zgen load hlissner/zsh-autopair
     zgen load zsh-users/zsh-syntax-highlighting
     zgen load zsh-users/zsh-autosuggestions
+    
     # ... add other custom plugins here ...
 
     # Source local files
     zgen load "$DOTFILES/lib"
     zgen load "$DOTFILES/custom"
+    
+    # Completions
     zgen load zsh-users/zsh-completions src
 
     zgen save
@@ -116,6 +130,11 @@ export Qt6_DIR="$HOME/Qt/6.6.1/gcc_64/lib/cmake/Qt6"
 
 # Starship prompt initialization
 eval "$(starship init zsh)"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+
 
 # Post-shell integration for Fig
 [[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.post.zsh"

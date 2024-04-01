@@ -68,21 +68,7 @@ update_dotfiles() {
   finish
 }
 
-update_brew() {
-  if ! _exists brew; then
-    return
-  fi
-
-  info "Updating Homebrew..."
-
-  brew update
-  brew upgrade
-  brew cleanup
-
-  finish
-}
-
-update_apt_get() {
+update_apt() {
   if ! _exists apt; then
     return
   fi
@@ -96,6 +82,31 @@ update_apt_get() {
 
   finish
 }
+
+update_global_npm_packages_with_ncu() {
+  if ! _exists npm || ! _exists ncu; then
+    return
+  fi
+
+  info "Updating all global NPM packages to their latest versions..."
+  sudo ncu -g -u
+  sudo npm update -g
+
+  finish
+}
+
+update_local_npm_dependencies_with_ncu() {
+  if ! _exists npm || ! _exists ncu; then
+    return
+  fi
+
+  info "Updating NPM dependencies in the current directory..."
+  ncu -u
+  npm install
+
+  finish
+}
+
 
 on_finish() {
   success "Done!"
@@ -124,8 +135,9 @@ main() {
 
   on_start "$*"
   update_dotfiles "$*"
-  update_brew "$*"
   update_apt "$*"
+  update_global_npm_packages_with_ncu "$*"
+  update_local_npm_dependencies_with_ncu "$*"
   on_finish "$*"
 }
 
